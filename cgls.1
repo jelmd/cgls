@@ -1,0 +1,150 @@
+.TH cgls 1 "2022-11-25"
+
+.SH "NAME"
+cgls \- show control group contents in a tree like manner.
+
+.SH "SYNOPSIS"
+.nh
+.na
+.HP
+.B cgls
+[\fB\-IXehkv\fR]
+[\fB\-s\ \fIunit\fR]...
+[\fB\-u\ \fIunit\fR]...
+[\fIcgroup\fR]...
+.ad
+.hy
+
+.SH "DESCRIPTION"
+.B cgls
+recursively shows the contents of the selected Linux control group hierarchies
+in a tree, i.e. shows the specified \fIunit\fRs and \fIcgroup\fRs and all
+its member processes plus all their subgroups and their members.
+
+
+.SH "OPERANDS"
+The control groups (\fIcgroup\fRs) may either be specified by their full
+file paths or are assumed in the systemd control group hierarchy. If no unit
+and no control group is specified and the current working directory is
+beneath the control group mount point \fB/sys/fs/cgroup\fR, shows the
+contents of the control group the working directory refers to. Otherwise,
+the full systemd control group hierarchy is shown.
+
+.SH "OPTIONS"
+.TP
+.B \-I
+.PD 0
+.TP
+.B \-\-no\-cgroup\-id
+Do not show control group IDs.
+
+.TP
+.B \-X
+.PD 0
+.TP
+.B \-\-no\-xattr
+Do not show extended attributes. Per default all extended attributes the user
+has access to are shown.
+
+.TP
+.B \-e
+.PD 0
+.TP
+.B \-\-empty
+Show empty control groups as well. By default, empty control groups are not
+shown.
+
+.TP 4
+.B \-h
+.PD 0
+.TP
+.B \-\-help
+Print a short help text and exit.
+
+.TP
+.B \-k
+.PD 0
+.TP
+.B \-\-kernel
+Show kernel threads as well. Per default kernel threads get ignored.
+
+.TP
+.BI \-s " unit"
+.PD 0
+.TP
+.BI \-\-system= unit
+Query the system DBus for the control group path of the given \fIunit\fR name
+and show it if resolvable.
+
+.TP
+.BI \-u " unit"
+.PD 0
+.TP
+.BI \-\-user= unit
+Query the user's DBus for the control group path of the given \fIunit\fR name
+and show it if resolvable.
+
+.TP
+.B \-v
+.PD 0
+.TP
+.B \-\-version
+Show version info and exit.
+
+
+.SH "EXIT STATUS"
+.B 0
+on success, a non-zero failure code otherwise.
+
+
+.SH "ENVIRONMENT"
+
+.TP 4
+.B XDG_RUNTIME_DIR
+If set, used to determine the path to the socket of the user's DBus.
+
+.TP 4
+.B SYSTEMD_COLORS
+If set to either \fB16\fR, \fB256\fR or a boolean value like \fBtrue\fR,
+\fBon\fR, \fB1\fR the corresponding color mode gets enabled. If unset the
+\fBNO_COLOR\fR gets evaluated. If unset as well color gets enabled unless
+\fBTERM\fR is set to \fBdumb\fR or the process hasn't any tty attached.
+Wrt. color depth see \fBCOLORTERM\fR.
+
+.TP 4
+.B NO_COLOR
+If set, and \fRSYSTEMD_COLORS\fR is not set, it disables colored output.
+
+.TP 4
+.B TERM
+Used to determine whether colored output should be enabled. If set to
+\fBdumb\fR it gets disabled unless superseded by \fRSYSTEMD_COLORS\fR or
+\fRNO_COLORS\fR. Furthermore if color mode is enabled and \fRTERM\fR is
+not set to \fRlinux\fR (i.e. not linux console), underlining gets enabled, too.
+
+.TP 4
+.B COLORTERM
+Use to decide the color depth to use. If set to \fBtruecolor\fR or \fB24bit\fR
+24bit mode is used, 8bit mode otherwise.
+
+
+.SH "NOTES"
+\fBcgls\fR got basically extracted/synthesized/simplified from the
+systemd sources v252 (see [1]) and than extended as needed.
+
+.SH "BUGS"
+https://github.com/jelmd/cgls is the official source code repository
+for \fBcgls\fR. If you find a bug or have ideas, which do not fit in
+systemd's repo or take too long to implement, feel free to create an
+issue via https://github.com/jelmd/cgls/issues .
+
+.SH "AUTHORS"
+Jens Elkner
+.br
+and all systemd contributors - see [2].
+
+.SH "SEE ALSO"
+[1]\ https://github.com/systemd/systemd
+.br
+[2]\ https://github.com/systemd/systemd/graphs/contributors
+.\" # vim: ts=4 sw=4 filetype=nroff

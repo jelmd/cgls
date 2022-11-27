@@ -913,7 +913,7 @@ is_kernel_thread(pid_t pid) {
 	char *line = NULL, *q, *end;
 	unsigned long long flags;
 	size_t l = 0, i;
-	char fname[12 + PID_MAX_DIGITS];	// 15 + 1 || 6 + PID_MAX_DIGITS + 5 + 1
+	char fname[22];		// gcc -O3 does not know, that we need max. 19 bytes
 	FILE *f;
 	int r;
 

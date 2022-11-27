@@ -43,13 +43,14 @@ help(void) {
 "Recursively show control group contents.\n\n"
 "  -h --help           Show this help\n"
 "  -v --version        Show package version\n"
+"  -I --no-cgroup-id   Do not show cgroup ID\n"
+"  -X --no-xattr       Do not show cgroup extended attributes\n"
 "  -e --empty          Show empty groups as well\n"
+"  -k --kernel         Include kernel threads in output\n"
+"  -m --me             Same as: -s user-`id -u`.slice\n"
 "  -s --system=unit    Show the subtrees of specified system unit\n"
 "  -u --user=unit      Show the subtrees of specified user unit\n"
-"  -X --no-xattr       Do not show cgroup extended attributes\n"
-"  -I --no-cgroup-id   Do not show cgroup ID\n"
-"  -k --kernel         Include kernel threads in output\n",
-		program_invocation_short_name);
+		, program_invocation_short_name);
 
 	return 0;
 }
@@ -67,6 +68,7 @@ parse_argv(int argc, char *argv[]) {
 		{ "help",      no_argument,       NULL, 'h' },
 		{ "empty",     no_argument,       NULL, 'e' },
 		{ "kernel",    no_argument,       NULL, 'k' },
+		{ "me",        no_argument,       NULL, 'm' },
 		{ "system",    optional_argument, NULL, 's' },
 		{ "user",      optional_argument, NULL, 'u' },
 		{ "version",   no_argument,       NULL, 'v' },
@@ -79,7 +81,7 @@ parse_argv(int argc, char *argv[]) {
 	char *name;
 	char **sys_units = NULL;	// temp store
 
-	while ((c = getopt_long(argc, argv, "heks:u:vXI", options, NULL)) >= 0) {
+	while ((c = getopt_long(argc, argv, "ehkms:u:vXI", options, NULL)) >= 0) {
 		switch (c) {
 			case 'h':
 				return help();
@@ -88,6 +90,20 @@ parse_argv(int argc, char *argv[]) {
 			case 'e':
 				arg_output_flags |= OUTPUT_SHOW_ALL;
 				break;
+			case 'k':
+				arg_output_flags |= OUTPUT_KERNEL_THREADS;
+				break;
+			case 'm': {
+#define _BUFLEN 22
+				char buf[_BUFLEN];
+				snprintf(buf, _BUFLEN, "user-%u.slice", geteuid());
+				buf[_BUFLEN-1] = '\0';
+#undef _BUFLEN
+				if (strv_push(&sys_units, buf, true) < 0)
+					LOG_OOM;
+				s++;
+				break;
+					  }
 			case 's':
 				c = unit_name_mangle(optarg, &name);
 				if (c < 0) {
@@ -107,9 +123,6 @@ parse_argv(int argc, char *argv[]) {
 				if (strv_push(&all_units, name, false) < 0)
 					LOG_OOM;
 				user_units++;
-				break;
-			case 'k':
-				arg_output_flags |= OUTPUT_KERNEL_THREADS;
 				break;
 			case 'X':
 				arg_output_flags &= ~(OUTPUT_CGROUP_XATTRS);
